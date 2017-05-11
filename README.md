@@ -16,7 +16,7 @@ This project aids in the process of bridging C++ and Mono C# code.  The code com
 
 # Interface Files
 
-These files define what and how you want to bridge between the languages.  They are very C++/C# like as to make translating classes simple. Below is a simple example of how the bridging of a c++ class might look.
+These files define what and how you want to bridge between the languages.  They are very C++/C# like as to make translating classes simple. Below is a simple example of how the bridging of a c++ class looks.
 
 ```
 class Clock
@@ -41,9 +41,9 @@ Once the executable is build you just need to pass in your interface files.  Thi
 line arguments.  The sourcecode is very simple, if you don't like it you can easily change the Main method to use any scheme you need.
 
 The current scheme for command line arguments.
-1: C++ Files Output Path
-2: C# Files Output Path
-3-?: Path to an interface file to read.  Repeat for as many files as you need.
+* C++ Files Output Path
+* C# Files Output Path
+* Path to an interface file to read.  Repeat for as many files as you need.
 
 Below is an example of how I accomplish this with CMake for our own projects.
 
