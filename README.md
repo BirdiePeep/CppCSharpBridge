@@ -3,7 +3,7 @@ Simple tool to bridge C++ and Mono C#.  No external dependencies required.
 
 # Overview
 
-This project aids in the process of bridging C++ and Mono C# code.  The code compiles into a executable that takes a list of interface files and generates both C++ and C# which bind the two languages using the Mono API.  This tool is designed to be simple and to the point, not requiring any external libraries or complicated make process.
+This project aids in the process of bridging C++ and Mono C# code.  The code compiles into a executable that reads in interface files and generates binding C++ and C# files. Once generated those files are all that is needed to bridge the languages.  This tool is designed to be simple and to the point, not requiring any external libraries or complicated make process.
 
 # Features
 
@@ -16,7 +16,7 @@ This project aids in the process of bridging C++ and Mono C# code.  The code com
 
 # Interface Files
 
-These files define what and how you want to bridge between the languages.  They are very C++/C# like as to make translating classes simple. Below is a simple example of how the bridging of a c++ class looks.
+These files define what and how you want to bridge between the languages.  They are C++/C# like but have some special syntax. Below is a simple example of how the bridging of a c++ class looks.
 
 ```
 class Clock
