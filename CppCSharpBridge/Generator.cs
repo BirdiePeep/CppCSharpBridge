@@ -2328,7 +2328,7 @@ public static bool operator !=($wraptype a, object b)
 				conversion = conversion.Replace("$vartype", wrapClass.cppType);
 				conversion = conversion.Replace("$wraptype", wrapClass.name);
 				conversion = conversion.Replace("$uniquename", wrapType.uniqueName);
-				conversion = conversion.Replace("$input", "obj");
+				conversion = conversion.Replace("$result", "obj");
 
 				buffer.Append(conversion);
 				buffer.Append("\n");

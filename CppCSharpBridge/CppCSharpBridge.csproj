@@ -7,8 +7,8 @@
     <ProjectGuid>{CB0E7711-785A-4F61-B7EA-3C6D858C369D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSharpWrapperGen</RootNamespace>
-    <AssemblyName>CSharpWrapperGen</AssemblyName>
+    <RootNamespace>CppCSharpBridge</RootNamespace>
+    <AssemblyName>CppCSharpBridge</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
