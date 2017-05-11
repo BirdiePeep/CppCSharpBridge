@@ -3,15 +3,22 @@ Simple tool to bridge C++ and Mono C#.  No external dependencies required.
 
 # Overview
 
-This project aids in the process of bridging C++ and Mono C# code.  The code compiles into a executable that takes a list of interface files
-and generates both C++ and C# which bind the two languages using the Mono API.  This tool is designed to be simple and to the point, not
-requiring any external libraries or complicated make process.
+This project aids in the process of bridging C++ and Mono C# code.  The code compiles into a executable that takes a list of interface files and generates both C++ and C# which bind the two languages using the Mono API.  This tool is designed to be simple and to the point, not requiring any external libraries or complicated make process.
+
+# Features
+
+* Namespaces
+* Class Inheritence
+* Virtual Methods
+* Reference Counting
+* Out/Ref Method Arguments
+* Struct Passing
 
 # Interface Files
 
-These files define what and how you want to bridge between the languages.  They are very C++/C# like as to make translating classes simple.
-Below is a simple example of how the bridging of a c++ class might look.
+These files define what and how you want to bridge between the languages.  They are very C++/C# like as to make translating classes simple. Below is a simple example of how the bridging of a c++ class might look.
 
+```
 class Clock
 {
   //Options
@@ -26,6 +33,7 @@ class Clock
   //Variables
   var double timestamp;
 }
+```
 
 # Passing Files To The Exe
 
@@ -39,6 +47,7 @@ The current scheme for command line arguments.
 
 Below is an example of how I accomplish this with CMake for our own projects.
 
+```
 file(GLOB CSHARP_WRAPPER_FILES
 	${PROJECT_SOURCE_DIR}/Game/CSharp/Interfaces/*.i
 )
@@ -49,6 +58,7 @@ execute_process(COMMAND
 	${PROJECT_SOURCE_DIR}/Game/CSharp/CSharp/
 	${CSHARP_WRAPPER_FILES}
 	)
+```
   
  # Conclusion
  
