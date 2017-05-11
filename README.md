@@ -22,8 +22,8 @@ These files define what and how you want to bridge between the languages.  They 
 class Clock
 {
   //Options
-  cppname Clock
-  cppinclude #include "Clock.h"
+  cppname MyClockClass
+  cppinclude #include "MyClockClass.h"
 
   //Methods
   func void resetTime(void);
