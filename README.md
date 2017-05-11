@@ -3,7 +3,7 @@ Simple tool to bridge C++ and Mono C#.  No external dependencies required.
 
 # Overview
 
-This project aids in the process of bridging C++ and Mono C# code.  The code compiles into a executable that reads in interface files and generates binding C++ and C# files. Once generated those files are all that is needed to bridge the languages.  This tool is designed to be simple and to the point, not requiring any external libraries or make process.
+This project bridges C++ and C# code through the Mono embedding API.  The code compiles into a executable that reads in interface files and generates binding C++ and C# files. Once generated those files are all that is needed to bridge the languages.  This tool is designed to be simple and to the point, not requiring any external libraries or make process.
 
 # Features
 
@@ -16,7 +16,7 @@ This project aids in the process of bridging C++ and Mono C# code.  The code com
 
 # Interface Files
 
-These files define what and how you want to bridge between the languages.  They are C++/C# like but have some special syntax. Below is a simple example of how the bridging of a c++ class looks.
+Interface files define what and how you want to bridge between the languages.  They are C++/C# like but have some special syntax. Below is an example interface for a C++ class.
 
 ```
 class Clock
@@ -58,6 +58,78 @@ execute_process(COMMAND
 	${PROJECT_SOURCE_DIR}/Game/CSharp/CSharp/
 	${CSHARP_WRAPPER_FILES}
 	)
+```
+
+# Initialization
+
+Once all the generated files are created, you simply add them to their respective projects.  The only other step is to call the CppCSharpBridge::Init() method inside of C++.
+
+Below is an more complex example of how I init mono and call the bridge init method.
+
+```
+void _monoLog(const char *log_domain, const char *log_level, const char *message, mono_bool fatal, void *user_data)
+{
+	if(log_domain)
+		cout << log_domain << endl;
+	if(log_level)
+		cout << log_level << endl;
+	if(message)
+		cout << message << endl;
+}
+void _monoPrint(const char *string, mono_bool is_stdout)
+{
+	cout << string << endl;
+}
+void _monoPrintErr(const char *string, mono_bool is_stdout)
+{
+	cout << string << endl;
+}
+bool InitMono(void)
+{
+	//Init
+	mono_config_parse(nullptr);
+
+	//Debugging
+	#ifdef ENABLE_MONO_SOFT_DEBUG
+	const char* options[] =
+	{
+		"--soft-breakpoints",
+		"--debugger-agent=transport=dt_socket,address=127.0.0.1:10000"
+	};
+	mono_jit_parse_options(2, (char**)options);
+	mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+	#endif
+
+	//Domain
+	domain = mono_jit_init("Game");
+	mono_thread_attach(domain);
+
+	//Init debugging
+	#ifdef ENABLE_MONO_SOFT_DEBUG
+	mono_debug_domain_create(domain);
+	#endif
+
+	//Assembly
+	assembly = mono_domain_assembly_open(domain, "GameCSharp.dll");
+	if(!assembly)
+		return false;
+
+	//Configure
+	if(!CppCSharpBridge::Init(domain, assembly))
+	{
+		cout << "Unable to init CppCSharpBridge" << endl;
+		assert(false);
+		return false;
+	}
+
+	//Logging
+	mono_trace_set_log_handler(_monoLog, nullptr);
+	mono_trace_set_print_handler(_monoPrint);
+	mono_trace_set_printerr_handler(_monoPrintErr);
+
+	//Return
+	return true;
+}
 ```
   
  # Conclusion
