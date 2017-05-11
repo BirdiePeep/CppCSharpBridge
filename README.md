@@ -1,5 +1,5 @@
 # CppCSharpBridge
-Simple tool to bridge C++ and Mono C#.  No external dependencies required.
+Simple tool to bridge C++ and C# for embedded Mono projects.  No external dependencies required.
 
 # Overview
 
