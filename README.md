@@ -62,4 +62,6 @@ execute_process(COMMAND
   
  # Conclusion
  
+ In the next coming days I will include examples, documentation and interface files for common complex types like strings.  The project works as in, but it will be bug are found or more complex features need added for my own needs.
+ 
  If you have any questions, feel free to e-mail me at chase.grozdina@gmail.com
