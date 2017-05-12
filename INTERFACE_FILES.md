@@ -86,7 +86,7 @@ If a type has not been defined or can't be found, we will use the type text verb
 
 # Namespaces
 
-We support namespaces inside of the interface files.  When you define a type inside of an namespace, it will assume the source type and generated type are also inside those namespaces.
+We support namespaces inside of the interface files.  Namespaces can exist at the top level or nested inside of other namespaces.  When you define a type inside of an namespace, it will assume the source type and generated type are also inside those namespaces.  Keep in mind when refering to a type you may need to qualify the type depending on what namespace you are in, much like C++/C#.
 
 ```
 namespace Game
