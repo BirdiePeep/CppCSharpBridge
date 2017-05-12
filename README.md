@@ -134,6 +134,8 @@ bool InitMono(void)
   
  # Conclusion
  
- In the next coming days I will include examples, documentation and interface files for common complex types like strings.  The project works as in, but it will be bug are found or more complex features need added for my own needs.
+ I have begun to write documentation for the tool.  I would recommend starting with "INTERFACE_FILES.md" as understanding how to write your interfaces is the majority of work involved.
+ 
+At this time the project works and I'm using it for my own purposes.  I will continue to expand it as for my own needs and fix any bugs that get brought up.  If you would like to get involved feel free to let me know.
  
  If you have any questions, feel free to e-mail me at chase.grozdina@gmail.com
