@@ -114,5 +114,6 @@ class Clock
 
 # Continued Reading
 
-You can read more details about each type by reading the INTERFACE-"TYPE".md file
+You can read more details about each type by reading its own INTERFACE-"TYPE".md file
+
 I would recommend starting with the TYPE type, as all other types are extentsion of this and inherit the same options.
