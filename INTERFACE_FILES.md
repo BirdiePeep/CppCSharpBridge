@@ -42,7 +42,13 @@ enum SeekPos
 {
   BEGIN,
   CURRENT,
-  END,
+  END
+}
+enum Numbers : int
+{
+  ZERO = 0,
+  ONE = 1,
+  TWO = 2
 }
 ```
 
@@ -50,25 +56,25 @@ enum SeekPos
 ```
 type uint8
 {
-	cpptype uint8_t
-	cpppass uint8_t
-	cstype byte
-	cspass byte
+    cpptype uint8_t
+    cpppass uint8_t
+    cstype byte
+    cspass byte
 }
 ```
 
 # Types - Advanced
 
-Each interface file can have any number of types.  Once a type is defined, it can be refered to in any other interface file.  Ordering of the type definitions do not matter and can exist in any file as long as they are all fed to the build tool at the same time.
+Each interface file can contain any number of types.  Once a type is defined, it can be refered to in any other interface file.  Ordering of the type definitions do not matter and can exist in any file as long as they are all fed to the build tool at the same time.
 
-Types can be nested in namespaces or classes.  Because of this, when you refer to a type you either have to give a fully qualified name or qualified enough for your current context.  This works like most object oriented C languages.
+Types can be nested in namespaces or classes.  Because of this, when you refer to a type you either have to give a fully qualified name or qualified enough for your current context.  This works like most object oriented C languages.  You can use either the . or :: dilimiter, in my examples I will be using the dot.
 
 ```
 //Defines a class inside of a namespace
 namespace Game
 {
   class Clock
-  {  
+  {
   }
 }
 
@@ -105,3 +111,7 @@ class Clock
   func int getTime();
 }
 ```
+
+# Continued Reading
+
+You can read more details about each type by reading the INTERFACE_"TYPE".md file.
