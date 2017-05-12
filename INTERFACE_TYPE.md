@@ -18,7 +18,7 @@ With the above defined in our interface file, we can now use "uint8" to pass aro
 
 # Options
 
-When you define a type there are many options available that change how it's handled inside of the build tool.  Keep in mind that all options are not case sensitive, so use whatever scheme fits your fancy, in my examples I will be using all lower case.
+When you define a type there are many options available that change how it's handled inside of the build tool.  Keep in mind that options are not case sensitive, so use whatever scheme fits your fancy, in my examples I will be using all lower case.
 
 Below is the current list of available options to the "type" type.
 
