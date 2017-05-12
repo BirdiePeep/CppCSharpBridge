@@ -2,6 +2,18 @@
 
 The "type" type is base that is used for every other type.  By itself it doesn't represent any kind of concept in any language, however we can use it to bridge many types of things.  Every other type inherits all options that "type" has, so it's good to have a clear understanding of it from the start.
 
+# Example
+
+```
+type uint8
+{
+    cpptype uint8_t
+    cpppass uint8_t
+    cstype byte
+    cspass byte
+}
+```
+
 # Options
 
 When you define a type there are many options available that change how it's handled inside of the build tool.  Keep in mind that all options are not case sensitive, so use whatever scheme fits your fancy, in my examples I will be using all lower case.
@@ -71,24 +83,24 @@ Below is an example of how we use these options to map the string classes betwee
 ```
 type string
 {
-	cpptype ::std::string
-	cpppass MonoString*
-	cppinconvert char* temp_$input = mono_string_to_utf8($input); $result = temp_$input; mono_free(temp_$input);
-	cppoutconvert $result = mono_string_new(mono_domain_get(), $input.c_str());
+    cpptype ::std::string
+    cpppass MonoString*
+    cppinconvert char* temp_$input = mono_string_to_utf8($input); $result = temp_$input; mono_free(temp_$input);
+    cppoutconvert $result = mono_string_new(mono_domain_get(), $input.c_str());
 	
-	cstype string
-	cspass string
+    cstype string
+    cspass string
 }
 
 type charptr
 {
-	cpptype const char*
-	cpppass MonoString*
-	cppinconvert ::std::string temp_str_$input; if($input) { char* temp_$input = mono_string_to_utf8($input); temp_str_$input = temp_$input; $result = temp_str_$input.c_str(); mono_free(temp_$input); } else { $result = nullptr;}
-	cppoutconvert $result = mono_string_new(mono_domain_get(), $input);
+    cpptype const char*
+    cpppass MonoString*
+    cppinconvert ::std::string temp_str_$input; if($input) { char* temp_$input = mono_string_to_utf8($input); temp_str_$input = temp_$input; $result = temp_str_$input.c_str(); mono_free(temp_$input); } else { $result = nullptr;}
+    cppoutconvert $result = mono_string_new(mono_domain_get(), $input);
 	
-	cstype string
-	cspass string
+    cstype string
+    cspass string
 }
 ```
 
