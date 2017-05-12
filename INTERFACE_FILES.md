@@ -24,18 +24,6 @@ struct Vector3
 }
 ```
 
-* Namespaces
-```
-namespace Game
-{
-  class Clock
-  {
-    func Clock();
-    func int getTime();
-  }
-}
-```
-
 * Enums
 ```
 enum SeekPos
@@ -95,6 +83,21 @@ namespace Game
 ```
 
 If a type has not been defined or can't be found, we will use the type text verbatim.  This is how simple types like "float", "int", ect are handled.
+
+# Namespaces
+
+We support namespaces inside of the interface files.  When you define a type inside of an namespace, it will assume the source type and generated type are also inside those namespaces.
+
+```
+namespace Game
+{
+  class Clock
+  {
+    func Clock();
+    func int getTime();
+  }
+}
+```
 
 # Commenting
 
