@@ -53,8 +53,8 @@ Similar to the above, except this is the text used when declaring a variable of 
 
 This specifies the variable type used when passing between the languages.  For example an enum might have a "cstype" of "AnimalType" but have a "cspass" of type "int".
 
+* cppoutpass
 * cppinpass
-* cppoutconvert
 * csoutpass
 * csinpass
 
