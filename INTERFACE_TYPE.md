@@ -14,7 +14,7 @@ type uint8
 }
 ```
 
-With the above defined in our interface file, we can now use "uint8" to pass around this data.
+With the above defined in our interface file, we can now use "uint8" to pass around this data.  As the binary size and structure of these types are the same the Mono API will correctly handle the passing and conversion of this data.  More complex types may need conversion method defined as you will see in the string example at the bottom of the page.
 
 # Options
 
