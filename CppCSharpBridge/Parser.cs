@@ -506,17 +506,7 @@ namespace CppCSharpBridge
 			//Check for options
 			switch(word.ToLower())
 			{
-				case "cppname":
-				{
-					string temp = parseLine();
-					if(String.IsNullOrEmpty(temp))
-					{
-						Console.Write("Error parsing on line:" + lineIndex);
-						return ParseResult.ERROR;
-					}
-					wrapType.cppName = temp;
-					return ParseResult.FOUND;
-				}
+				
 				case "csname":
 				{
 					string temp = parseLine();
@@ -549,6 +539,17 @@ namespace CppCSharpBridge
 					}
 					wrapType.csInPass = temp;
 					wrapType.csOutPass = temp;
+					return ParseResult.FOUND;
+				}
+				case "cppname":
+				{
+					string temp = parseLine();
+					if(String.IsNullOrEmpty(temp))
+					{
+						Console.Write("Error parsing on line:" + lineIndex);
+						return ParseResult.ERROR;
+					}
+					wrapType.cppName = temp;
 					return ParseResult.FOUND;
 				}
 				case "cpptype":
@@ -937,6 +938,11 @@ namespace CppCSharpBridge
 							method.isAbstract = true;
 							continue;
 						}
+						case "unsafe":
+						{
+							method.isUnsafe = true;
+							continue;
+						}
 					}
 
 					//End
@@ -1096,7 +1102,7 @@ namespace CppCSharpBridge
 					}
 
 					//Read name
-					word = parseWord(new char[] { ' ', ')', ',' });
+					word = parseWord(new char[] { ' ', ')', ',', '&', '*' });
 					if(String.IsNullOrEmpty(word))
 					{
 						Console.Write("Unable to parse argument type at line:" + lineIndex);
@@ -1104,6 +1110,14 @@ namespace CppCSharpBridge
 					}
 				}
 				wrapArg.type = word;
+
+				//Is CPP Reference
+				word = parseWord(new char[] { ' ', ',', ')' }, false);
+				if(word == "&")
+				{
+					Console.Write("word:" + word);
+					wrapArg.cppRef = true;
+				}
 
 				//Argument Name
 				skipPast(new char[] { ' ', '*', '&' });
@@ -1600,14 +1614,24 @@ namespace CppCSharpBridge
 			wrapType.csType = "$langtype";
 			wrapType.csInPass = "$langtype";
 			wrapType.csOutPass = "$langtype";
-			
-			wrapType.parentContext = currentContext;
+
+			//Create context
+			WrapContext context = new WrapContext();
+			context.name = wrapType.name;
+			context.sourceType = wrapType;
+			context.parent = currentContext;
+			context.parent.children.Add(wrapType.name, context);
+			currentContext = context;
+
+			//Link
+			wrapType.parentContext = context.parent;
+			wrapType.context = context;
 
 			//Build qualified name
 			string qualifiedName = "";
 			{
 				List<string> names = new List<string>();
-				WrapContext tempContext = currentContext;
+				WrapContext tempContext = currentContext.parent;
 				while(tempContext != null)
 				{
 					//Add
@@ -1661,6 +1685,9 @@ namespace CppCSharpBridge
 			//Finalize
 			finalizeStruct(wrapType);
 
+			//Pop Context
+			currentContext = currentContext.parent;
+
 			//Add
 			generator.structs.Add(wrapType);
 			currentContext.types.Add(wrapType.name, wrapType);
@@ -1706,6 +1733,12 @@ namespace CppCSharpBridge
 				case "textbegin":
 				{
 					if(!parseTextBlock(wrapType))
+						return false;
+					break;
+				}
+				case "enum":
+				{
+					if(!parseEnum())
 						return false;
 					break;
 				}

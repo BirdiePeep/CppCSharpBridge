@@ -394,6 +394,7 @@ namespace CppCSharpBridge
 		public bool isVirtual = false;
 		public bool isAbstract = false;
 		public bool isConst = false;
+		public bool isUnsafe = false;
 
 		public WrapMethod() { }
 
@@ -407,6 +408,7 @@ namespace CppCSharpBridge
 			result.isVirtual = isVirtual;
 			result.isAbstract = isAbstract;
 			result.isConst = isConst;
+			result.isUnsafe = isUnsafe;
 
 			return result;
 		}
@@ -444,6 +446,8 @@ namespace CppCSharpBridge
 				//Check if struct
 				if(type is WrapStruct && !wrapArg.moveOut)
 					buffer.Append("*");
+				else if(wrapArg.cppRef)
+					buffer.Append("*");
 
 				if(String.IsNullOrEmpty(type.cppInConvert))
 				{
@@ -475,6 +479,8 @@ namespace CppCSharpBridge
 		public bool moveIn = true;
 		public bool moveOut = false;
 
+		public bool cppRef = false;
+
 		public WrapMethodArg() { }
 		public WrapMethodArg(string type, string name)
 		{
@@ -495,6 +501,7 @@ namespace CppCSharpBridge
 	public class WrapStruct : WrapType
 	{
 		public List<WrapVariable> variables = new List<WrapVariable>();
+		public WrapContext context;
 	}
 	public class WrapEnum : WrapType
 	{
@@ -528,7 +535,7 @@ namespace CppCSharpBridge
 
 		public WrapType findType(string name)
 		{
-			string[] names = name.Split(new char[] { '.' });
+			string[] names = name.Split(new string[] { ".", "::" }, StringSplitOptions.None);
 			return findType(names, 0);
 		}
 		public WrapType findType(string[] names, int index)

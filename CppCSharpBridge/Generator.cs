@@ -211,6 +211,10 @@ namespace CppCSharpBridge
 				else if(wrapClass.interfaceType == WrapClass.InterfaceType.CSHARP_TO_CPP)
 					csToCppClasses.Add(wrapClass);
 			}
+			if(!sortClasses(cppToCsClasses))
+				return false;
+			if(!sortClasses(csToCppClasses))
+				return false;
 
 			//Write CS Files ----------------------------
 			if(!writeWrapperCsFile())
@@ -235,7 +239,7 @@ namespace CppCSharpBridge
 					continue;
 
 				//Check if has data
-				if(wrapType.textBlocks.Count() == 0)
+				if(wrapType.textBlocks.Count() == 0 && wrapType.variables.Count() == 0)
 					continue;
 
 				//Write file
@@ -261,6 +265,55 @@ namespace CppCSharpBridge
 			}
 
 			//Return
+			return true;
+		}
+		public bool sortClasses(List<WrapClass> classList)
+		{
+			HashSet<WrapClass> addedMap = new HashSet<WrapClass>();
+			List<WrapClass> newList = new List<WrapClass>();
+
+			while(true)
+			{
+				bool classAdded = false;
+				int size = classList.Count;
+				for(int i=0; i<size; i++)
+				{
+					var wrapClass = classList[i];
+
+					//Check if parent class has been defined yet
+					var parentClass = findClass(wrapClass.parentClass, wrapClass.context);
+					if(parentClass != null)
+					{
+						if(!addedMap.Contains(parentClass))
+							continue;
+					}
+
+					//Add to new list
+					newList.Add(wrapClass);
+					addedMap.Add(wrapClass);
+					classAdded = true;
+
+					//Remove from old list
+					classList.RemoveAt(i);
+					size--;
+					i--;
+				}
+
+				//End
+				if(classList.Count == 0)
+					break;
+				else
+				{
+					if(!classAdded)
+					{
+						Console.Write("Generator::sortClasses - Unable to sort classes");
+						return false;
+					}
+				}
+			}
+
+			//Return true
+			classList.AddRange(newList);
 			return true;
 		}
 
@@ -1350,6 +1403,8 @@ public static bool operator !=($wraptype a, object b)
 
 			//Declaration
 			buffer.Append("[MethodImpl(MethodImplOptions.InternalCall)]\n");
+			if(wrapMethod.isUnsafe)
+				buffer.Append("unsafe ");
 			buffer.Append("extern static void ");
 			buffer.Append(staticMethodName);
 			buffer.Append("(");
@@ -1407,6 +1462,8 @@ public static bool operator !=($wraptype a, object b)
 				else
 					buffer.Append("virtual ");
 			}
+			if(wrapMethod.isUnsafe)
+				buffer.Append("unsafe ");
 			if(wrapMethod.isStatic)
 				buffer.Append("static ");
 			buffer.Append(findType(wrapMethod.returnType).csType);
@@ -1855,6 +1912,20 @@ public static bool operator !=($wraptype a, object b)
 					buffer.Append(wrapVariable.name);
 					buffer.Append(";\n");
 				}
+			}
+
+			//Enums
+			List<WrapEnum> enumList = new List<WrapEnum>();
+			foreach(WrapEnum wrapEnum in enums)
+			{
+				if(wrapEnum.parentContext == wrapStruct.context)
+					enumList.Add(wrapEnum);
+			}
+			if(enumList.Count() > 0)
+			{
+				buffer.Append("//Enums --------------------\n");
+				foreach(WrapEnum wrapEnum in enumList)
+					writeCppWrap_CSharpEnum(wrapEnum, buffer);
 			}
 
 			//Text blocks
@@ -2536,6 +2607,9 @@ public static bool operator !=($wraptype a, object b)
 						if(!wrapClass.isFinalMethod(this, wrapMethod))
 							continue;
 
+						//Set context
+						this.currentContext = tempWrapClass.context;
+
 						//------------------------------------------------------
 						//Begin method definition
 						buffer.Append(findType(wrapMethod.returnType).cppType);
@@ -2648,7 +2722,8 @@ public static bool operator !=($wraptype a, object b)
 					if(String.IsNullOrEmpty(tempWrapClass.parentClass))
 						break;
 					tempWrapClass = findClass(tempWrapClass.parentClass);
-				}
+				} //End while
+				this.currentContext = wrapClass.context;
 
 				//Virtual method variables
 				tempWrapClass = wrapClass;
@@ -3169,6 +3244,8 @@ public static bool operator !=($wraptype a, object b)
 		public void writeCsWrap_CSharpMethod(WrapClass wrapClass, WrapMethod wrapMethod, StringBuilder buffer)
 		{
 			//Begin method
+			if(wrapMethod.isUnsafe)
+				buffer.Append("unsafe ");
 			buffer.Append("public static ");
 			buffer.Append(findType(wrapMethod.returnType).csOutPass);
 			buffer.Append(" ");
@@ -3433,6 +3510,8 @@ public static bool operator !=($wraptype a, object b)
 			foreach(WrapMethod wrapMethod in wrapClass.methods)
 			{
 				//Static
+				if(wrapMethod.isUnsafe)
+					buffer.Append("unsafe ");
 				if(wrapMethod.isStatic)
 					buffer.Append("static ");
 
