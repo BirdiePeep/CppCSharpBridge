@@ -277,7 +277,10 @@ namespace CppCSharpBridge
 		public bool explicitConstruction = false;		//Can't new normally, only though explicit New and Delete static methods
 		public bool explicitDeconstruction = false;     //Can't new normally, only though explicit New and Delete static methods
 
-		public bool cppCanBePassed = true;					//Can this be passed through to C#, or is it there just to
+		public bool cppCanBePassed = true;              //Can this be passed through to C#, or is it there just to
+
+		//Affects C++/C# generation
+		public bool isSealed = false;					//Internal flag, used to determine if a C++ wrapper object is created
 
 		//Meta Data
 		//public string cppNameQualified;			//Name with fully qualified namespace

@@ -840,6 +840,7 @@ namespace CppCSharpBridge
 					wrapType.cppWrapperConstruct = "//No ref count\n";
 					wrapType.explicitConstruction = true;
 					wrapType.explicitDeconstruction = true;
+					wrapType.isSealed = true;
 					break;
 				}
 				case "cppnopass":

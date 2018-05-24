@@ -680,7 +680,7 @@ namespace CppCSharpBridge
 				buffer.Append(");\n");
 
 				//Wrap classes
-				if(wrapClass.constructors.Count() > 0)
+				if(wrapClass.constructors.Count() > 0 && !wrapClass.isSealed)
 				{
 					buffer.Append("classMap[typeid(");
 					buffer.Append(wrapClass.uniqueName);
@@ -778,6 +778,10 @@ namespace CppCSharpBridge
 			//Declare class
 			buffer.Append("public class CppCSharpBridge\n");
 			buffer.Append("{\n");
+
+			//Define NoValue
+			//Used to help make struct wrapper types nullable
+			buffer.Append("public class NoValue {}\n");
 
 			//Build directors
 			foreach(WrapClass wrapClass in csToCppClasses)
@@ -951,8 +955,21 @@ namespace CppCSharpBridge
 				}
 			}
 
-			//Operators
-			//if(classType == "struct")
+			//Operators - Struct Only
+			if(classType == "struct")
+			{
+				string conversion = @"
+public static implicit operator $wraptype(CppCSharpBridge.NoValue value)
+{
+	return new $wraptype(IntPtr.Zero);
+}";
+
+				conversion = conversion.Replace("$wraptype", wrapClass.csName);
+				buffer.Append(conversion);
+				buffer.Append("\n");
+			}
+
+			//Operators - All
 			{
 				//Equals
 				string conversion = @"
@@ -1160,37 +1177,43 @@ public static bool operator !=($wraptype a, object b)
 							buffer.Append(");\n");
 
 							//Wrapper constructor
-							buffer.Append("else\n");
-							buffer.Append("objCPtr = ");
-							buffer.Append(wrapClass.name);
-							buffer.Append("_ConstructorWrapper");
-							buffer.Append(constructorIter);
-							buffer.Append("(this");
+							if(!wrapClass.isSealed)
 							{
-								foreach(WrapMethodArg wrapArg in wrapMethod.args)
+								buffer.Append("else\n");
+								buffer.Append("objCPtr = ");
+								buffer.Append(wrapClass.name);
+								buffer.Append("_ConstructorWrapper");
+								buffer.Append(constructorIter);
+								buffer.Append("(this");
 								{
-									buffer.Append(", ");
-									buffer.Append(wrapArg.name);
+									foreach(WrapMethodArg wrapArg in wrapMethod.args)
+									{
+										buffer.Append(", ");
+										buffer.Append(wrapArg.name);
+									}
 								}
+								buffer.Append(");\n");
 							}
-							buffer.Append(");\n");
 						}
 						else
 						{
 							//Just wrapper method
-							buffer.Append("objCPtr = ");
-							buffer.Append(wrapClass.name);
-							buffer.Append("_ConstructorWrapper");
-							buffer.Append(constructorIter);
-							buffer.Append("(this");
+							if(!wrapClass.isSealed)
 							{
-								foreach(WrapMethodArg wrapArg in wrapMethod.args)
+								buffer.Append("objCPtr = ");
+								buffer.Append(wrapClass.name);
+								buffer.Append("_ConstructorWrapper");
+								buffer.Append(constructorIter);
+								buffer.Append("(this");
 								{
-									buffer.Append(", ");
-									buffer.Append(wrapArg.name);
+									foreach(WrapMethodArg wrapArg in wrapMethod.args)
+									{
+										buffer.Append(", ");
+										buffer.Append(wrapArg.name);
+									}
 								}
+								buffer.Append(");\n");
 							}
-							buffer.Append(");\n");
 						}
 
 						buffer.Append("}\n");
@@ -1224,25 +1247,28 @@ public static bool operator !=($wraptype a, object b)
 					}
 
 					//Static - Constructor Wrapper
-					buffer.Append("[MethodImpl(MethodImplOptions.InternalCall)]\n");
-					buffer.Append("extern static IntPtr ");
-					buffer.Append(wrapClass.name);
-					buffer.Append("_ConstructorWrapper");
-					buffer.Append(constructorIter);
-					buffer.Append("(Object obj");
+					if(!wrapClass.isSealed)
 					{
-						foreach(WrapMethodArg wrapArg in wrapMethod.args)
+						buffer.Append("[MethodImpl(MethodImplOptions.InternalCall)]\n");
+						buffer.Append("extern static IntPtr ");
+						buffer.Append(wrapClass.name);
+						buffer.Append("_ConstructorWrapper");
+						buffer.Append(constructorIter);
+						buffer.Append("(Object obj");
 						{
-							//Comma
-							buffer.Append(", ");
+							foreach(WrapMethodArg wrapArg in wrapMethod.args)
+							{
+								//Comma
+								buffer.Append(", ");
 
-							//Arg
-							buffer.Append(findType(wrapArg.type).csOutPass);
-							buffer.Append(" ");
-							buffer.Append(wrapArg.name);
+								//Arg
+								buffer.Append(findType(wrapArg.type).csOutPass);
+								buffer.Append(" ");
+								buffer.Append(wrapArg.name);
+							}
 						}
+						buffer.Append(");\n");
 					}
-					buffer.Append(");\n");
 					buffer.Append("\n");
 				}
 
@@ -1945,7 +1971,7 @@ public static bool operator !=($wraptype a, object b)
 			currentContext = wrapClass.context;
 
 			//Writer C++ Wrapper class --------------------------------------------------
-			if(wrapClass.constructors.Count() > 0)
+			if(wrapClass.constructors.Count() > 0 && !wrapClass.isSealed)
 				writeCppWrap_CppWrapperClass(wrapClass, buffer);
 
 			//Wrapper Constructors --------------------------------------------------
@@ -2016,21 +2042,24 @@ public static bool operator !=($wraptype a, object b)
 					}
 
 					//Constructor Wrapper ----------------------------
-					buffer.Append("mono_add_internal_call(\"");
+					if(!wrapClass.isSealed)
+					{
+						buffer.Append("mono_add_internal_call(\"");
 
-					//Arg 1
-					buffer.Append(classQualifier);
-					buffer.Append("::");
-					buffer.Append(wrapClass.name);
-					buffer.Append("_ConstructorWrapper");
-					buffer.Append(constructorCount);
-					buffer.Append("\", ");
+						//Arg 1
+						buffer.Append(classQualifier);
+						buffer.Append("::");
+						buffer.Append(wrapClass.name);
+						buffer.Append("_ConstructorWrapper");
+						buffer.Append(constructorCount);
+						buffer.Append("\", ");
 
-					//Arg 2
-					buffer.Append(wrapClass.uniqueName);
-					buffer.Append("_ConstructorWrapper");
-					buffer.Append(constructorCount);
-					buffer.Append(");\n");
+						//Arg 2
+						buffer.Append(wrapClass.uniqueName);
+						buffer.Append("_ConstructorWrapper");
+						buffer.Append(constructorCount);
+						buffer.Append(");\n");
+					}
 
 					//Iterate
 					constructorCount += 1;
@@ -2273,6 +2302,7 @@ public static bool operator !=($wraptype a, object b)
 					}
 
 					//Constructor Wrapper
+					if(!wrapClass.isSealed)
 					{
 						//Method begin
 						buffer.Append("static void* ");
@@ -2386,8 +2416,8 @@ public static bool operator !=($wraptype a, object b)
 				//Check if null
 				buffer.Append("if(!obj) return nullptr;\n");
 
-				//Polymorphic
-				if(findIfPolymorphic(wrapClass.uniqueName))
+				//Check for wrapped class
+				if(wrapClass.constructors.Count() > 0 && !wrapClass.isSealed)
 				{
 					buffer.Append("const InheritedClass* wrapper = dynamic_cast<const InheritedClass*>(obj);\n");
 					buffer.Append("if(wrapper) { return wrapper->monoObjPtr; }\n");
@@ -3417,15 +3447,15 @@ public static bool operator !=($wraptype a, object b)
 				{
 					//Return
 					type = findType(wrapMethod.returnType);
-					if(!String.IsNullOrEmpty(type.cppInclude) && !typeIncludes.ContainsKey(type.name))
-						typeIncludes.Add(type.name, type.cppInclude);
+					if(!String.IsNullOrEmpty(type.cppInclude) && !typeIncludes.ContainsKey(type.uniqueName))
+						typeIncludes.Add(type.uniqueName, type.cppInclude);
 
 					//Args
 					foreach(WrapMethodArg wrapArg in wrapMethod.args)
 					{
 						type = findType(wrapArg.type);
-						if(!String.IsNullOrEmpty(type.cppInclude) && !typeIncludes.ContainsKey(type.name))
-							typeIncludes.Add(type.name, type.cppInclude);
+						if(!String.IsNullOrEmpty(type.cppInclude) && !typeIncludes.ContainsKey(type.uniqueName))
+							typeIncludes.Add(type.uniqueName, type.cppInclude);
 					}
 				}
 
